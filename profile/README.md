@@ -1,4 +1,3 @@
-# MinecraftschurliMods
 ## About
 What is MinecraftschurliMods?
 I (the founder of this organisation) am Minecraftschurli and we make Mods and modding libraries for Minecraft.

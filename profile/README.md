@@ -10,3 +10,6 @@ Contributions are always welcome in all forms from pull requests or feature requ
 
 ## Discord
 Yes we have a discord you can join it [here](https://discord.gg/GcFqXwX)
+
+## Powered by
+[![IntelliJ IDEA logo](https://resources.jetbrains.com/storage/products/company/brand/logos/IntelliJ_IDEA.svg)](https://jb.gg/OpenSourceSupport)

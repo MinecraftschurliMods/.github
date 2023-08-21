@@ -72,6 +72,19 @@ jobs:
         with:
           arguments: runGameTestServer
 
+      - name: "Run datagen with Gradle"
+        uses: gradle/gradle-build-action@v2
+        id: datagen
+        with:
+          arguments: runData
+
+      - name: "Check for datagen Changes"
+        uses: minecraftschurli/verify-changed-files@main
+        with:
+          fail-if-changed: true
+          files: |
+            "src/main/generated/**"
+
       - name: "Publish with Gradle"
         uses: gradle/gradle-build-action@v2
         if: ${{ inputs.publish-to-maven }}

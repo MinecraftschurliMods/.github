@@ -21,6 +21,9 @@ on:
       release-type:
         type: string
         default: "snapshot"
+      check-datagen:
+        type: boolean
+        default: false
 
     secrets:
       MAVEN_PASSWORD:
@@ -74,12 +77,14 @@ jobs:
 
       - name: "Run datagen with Gradle"
         uses: gradle/gradle-build-action@v2
+        if: ${{ inputs.check-datagen }}
         id: datagen
         with:
           arguments: runData
 
       - name: "Check for datagen Changes"
-        uses: minecraftschurli/verify-changed-files@main
+        uses: tj-actions/verify-changed-files@main
+        if: ${{ inputs.check-datagen }}
         with:
           fail-if-changed: true
           files: |

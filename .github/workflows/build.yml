@@ -23,7 +23,7 @@ on:
         default: "snapshot"
       check-datagen:
         type: boolean
-        default: false
+        default: true
 
     secrets:
       MAVEN_PASSWORD:

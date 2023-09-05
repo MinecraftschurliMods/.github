@@ -89,9 +89,13 @@ jobs:
         if: ${{ inputs.check-datagen }}
         id: check-data
         run: |
-          if [ "$(git diff --ignore-space-at-eol --text ${{ inputs.datagen-folder }} | wc -l)" -gt "0" ]; then
+          changes_diff=$(git diff --ignore-space-at-eol --text ${{ inputs.datagen-folder }} | wc -l)
+          changes_status=$(git status --porcelain ${{ inputs.datagen-folder }} | wc -l)
+          changes=$(( $changes_diff + $changes_status ))
+          if [ "$changes" -gt "0" ]; then
             echo "Detected uncommitted changes after build. See status below:"
             git diff --ignore-space-at-eol --text ${{ inputs.datagen-folder }}
+            git status ${{ inputs.datagen-folder }}
             exit 1
           fi
 

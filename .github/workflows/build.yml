@@ -24,6 +24,9 @@ on:
       check-datagen:
         type: boolean
         default: true
+      datagen-folder:
+        type: string
+        default: ""
 
     secrets:
       MAVEN_PASSWORD:
@@ -83,12 +86,14 @@ jobs:
           arguments: runData
 
       - name: "Check for datagen Changes"
-        uses: tj-actions/verify-changed-files@main
         if: ${{ inputs.check-datagen }}
-        with:
-          fail-if-changed: true
-          files: |
-            src/main/generated/**
+        id: check-data
+        run: |
+          if [ "$(git diff --ignore-space-at-eol --text ${{ inputs.datagen-folder }} | wc -l)" -gt "0" ]; then
+            echo "Detected uncommitted changes after build. See status below:"
+            git diff --ignore-space-at-eol --text ${{ inputs.datagen-folder }}
+            exit 1
+          fi
 
       - name: "Publish with Gradle"
         uses: gradle/gradle-build-action@v2

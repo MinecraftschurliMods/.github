@@ -88,7 +88,7 @@ jobs:
         with:
           fail-if-changed: true
           files: |
-            "src/main/generated/**"
+            src/main/generated/**
 
       - name: "Publish with Gradle"
         uses: gradle/gradle-build-action@v2

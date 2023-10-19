@@ -3,6 +3,9 @@ name: "Publish"
 on:
   workflow_call:
     inputs:
+      dry:
+        type: boolean
+        default: false
       java-version:
         type: number
         default: 17
@@ -60,58 +63,38 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: build-artifacts
-          path: build/libs/
+          path: artifacts/
 
       - name: "Download Changelog"
         uses: actions/download-artifact@v3
         with:
           name: changelog
 
-      - name: "Publish to GitHub"
-        id: publish-github
-        if: ${{ inputs.platform == 'GitHub' }}
+      - name: Publish to ${{ inputs.platform }}
+        if: ${{ inputs.dry == 'false' }}
+        id: publish
         uses: Kir-Antipov/mc-publish@v3.3
         with:
           java: ${{ inputs.java-version }}
           changelog-file: changelog.md
           name: ${{ inputs.modid }}-${{ inputs.version }}
           github-token: ${{ secrets.GH_TOKEN }}
-          github-files: |
-            build/libs/!(*-@(all|api|deobf|slim|sources|javadoc)).jar
-            build/libs/*-@(all|api|deobf|slim|sources|javadoc).jar
-
-      - name: "Publish to CurseForge"
-        id: publish-curseforge
-        if: ${{ inputs.platform == 'CurseForge' }}
-        uses: Kir-Antipov/mc-publish@v3.3
-        with:
-          java: ${{ inputs.java-version }}
-          changelog-file: changelog.md
-          name: ${{ inputs.modid }}-${{ inputs.version }}
-          files: build/libs/!(*-@(all|api|deobf|slim|sources|javadoc)).jar
           curseforge-token: ${{ secrets.CF_API_TOKEN }}
-
-      - name: "Publish to Modrinth"
-        id: publish-modrinth
-        if: ${{ inputs.platform == 'Modrinth' }}
-        uses: Kir-Antipov/mc-publish@v3.3
-        with:
-          java: ${{ inputs.java-version }}
-          changelog-file: changelog.md
-          name: ${{ inputs.modid }}-${{ inputs.version }}
-          files: build/libs/!(*-@(all|api|deobf|slim|sources|javadoc)).jar
           modrinth-token: ${{ secrets.MODRINTH_TOKEN }}
+          files: |
+            artifacts/!(*-@(all|api|deobf|slim|sources|javadoc)).jar
+            artifacts/*-@(all|api|deobf|slim|sources|javadoc).jar
 
     outputs:
-      modrinth-id: ${{ steps.publish-modrinth.outputs.modrinth-id }}
-      modrinth-version: ${{ steps.publish-modrinth.outputs.modrinth-version }}
-      modrinth-url: ${{ steps.publish-modrinth.outputs.modrinth-url }}
-      modrinth-files: ${{ steps.publish-modrinth.outputs.modrinth-files }}
-      curseforge-id: ${{ steps.publish-curseforge.outputs.curseforge-id }}
-      curseforge-version: ${{ steps.publish-curseforge.outputs.curseforge-version }}
-      curseforge-url: ${{ steps.publish-curseforge.outputs.curseforge-url }}
-      curseforge-files: ${{ steps.publish-curseforge.outputs.curseforge-files }}
-      github-repo: ${{ steps.publish-github.outputs.github-repo }}
-      github-tag: ${{ steps.publish-github.outputs.github-tag }}
-      github-url: ${{ steps.publish-github.outputs.github-url }}
-      github-files: ${{ steps.publish-github.outputs.github-files }}
+      modrinth-id: ${{ steps.publish.outputs.modrinth-id }}
+      modrinth-version: ${{ steps.publish.outputs.modrinth-version }}
+      modrinth-url: ${{ steps.publish.outputs.modrinth-url }}
+      modrinth-files: ${{ steps.publish.outputs.modrinth-files }}
+      curseforge-id: ${{ steps.publish.outputs.curseforge-id }}
+      curseforge-version: ${{ steps.publish.outputs.curseforge-version }}
+      curseforge-url: ${{ steps.publish.outputs.curseforge-url }}
+      curseforge-files: ${{ steps.publish.outputs.curseforge-files }}
+      github-repo: ${{ steps.publish.outputs.github-repo }}
+      github-tag: ${{ steps.publish.outputs.github-tag }}
+      github-url: ${{ steps.publish.outputs.github-url }}
+      github-files: ${{ steps.publish.outputs.github-files }}

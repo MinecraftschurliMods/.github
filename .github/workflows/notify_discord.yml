@@ -1,0 +1,88 @@
+name: "Notify Discord"
+
+on:
+  workflow_call:
+    inputs: 
+      project_name:
+        description: The name of the project used in the message
+        type: string
+        required: true
+      version:
+        description: The version of the project that was released
+        type: string
+        required: true
+      summary:
+        description: The summary of the published update
+        type: string
+        required: true
+      curseforge_url:
+        description: The url to the published version on curseforge
+        type: string
+        required: true
+      modrinth_url:
+        description: The url to the published version on modrinth
+        type: string
+        required: true
+      github_url:
+        description: The url to the published version on github
+        type: string
+        required: true
+      logo_url:
+        description: The url of the logo of the project used for the webhook avatar and the embed thumbnail
+        type: string
+        required: true
+      update_ping:
+        description: The role or user id to ping with the message
+        type: string
+        required: true
+      embed_color:
+        description: The color used in the embed
+        type: string
+        default: "#00ff00"
+    secrets:
+      DISCORD_WEBHOOK:
+        description: The webhook url for the discord webhook
+        required: true
+
+jobs:
+  send-notification:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get Timestamp
+        id: timestamp
+        uses: nanzm/get-time-action@v2.0
+        with:
+          format: "YYYY-MM-DDTHH:mm:ssZ"
+      - name: Send Notification
+        uses: Minecraftschurli/notify-discord-action@main
+        with:
+          webhook_url: ${{ secrets.DISCORD_WEBHOOK }}
+          username: "${{ inputs.project_name }}"
+          avatar_url: "${{ inputs.logo_url }}"
+          message: "<@${{ inputs.update_ping }}> Update version ${{ inputs.version }} for ${{ inputs.project_name }} was released!"
+          embeds: '[
+            {
+              "title": "Update Released",
+              "timestamp": "${{ steps.timestamp.outputs.time }}",
+              "color": "${{ inputs.embed_color }}",
+              "footer": {
+                "text": "${{ inputs.project_name }}"
+              },
+              "thumbnail": {
+                "url": "${{ inputs.logo_url }}"
+              },
+              "author": {
+                "name": "${{ github.actor }}",
+                "icon_url": "https://avatars.githubusercontent.com/u/${{ github.actor_id }}"
+              },
+              "fields": [
+                { "name": "Version", "value": "`${{ inputs.version }}`" },
+                { "name": "CurseForge", "value": "[Download](${{ inputs.curseforge_url }})", "inline": true },
+                { "name": "Modrinth", "value": "[Download](${{ inputs.modrinth_url }})", "inline": true },
+                { "name": "GitHub", "value": "[View](${{ inputs.github_url }})", "inline": true },
+                { "name": "Summary", "value": "```${{ inputs.summary }}```" }
+              ]
+            }
+          ]'
+          allowed_mentions: |
+            ${{ inputs.update_ping }}

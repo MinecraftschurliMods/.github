@@ -74,9 +74,9 @@ jobs:
           java: ${{ inputs.java-version }}
           changelog-file: changelog.md
           name: ${{ inputs.modid }}-${{ inputs.version }}
-          github-token: ${{ secrets.GH_TOKEN }}
-          curseforge-token: ${{ secrets.CF_API_TOKEN }}
-          modrinth-token: ${{ secrets.MODRINTH_TOKEN }}
+          github-token: ${{ inputs.platform == 'GitHub' && secrets.GH_TOKEN || '${undefined}' }}
+          curseforge-token: ${{ inputs.platform == 'CurseForge' && secrets.CF_API_TOKEN || '${undefined}' }}
+          modrinth-token: ${{ inputs.platform == 'Modrinth' && secrets.MODRINTH_TOKEN || '${undefined}' }}
           files: |
             artifacts/!(*-@(all|api|deobf|slim|sources|javadoc)).jar
             artifacts/*-@(all|api|deobf|slim|sources|javadoc).jar

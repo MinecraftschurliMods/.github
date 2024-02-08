@@ -3,9 +3,6 @@ name: "Publish"
 on:
   workflow_call:
     inputs:
-      dry:
-        type: boolean
-        default: false
       java-version:
         type: number
         default: 17
@@ -71,7 +68,6 @@ jobs:
           name: changelog
 
       - name: Publish to ${{ inputs.platform }}
-        if: ${{ inputs.dry == 'false' }}
         id: publish
         uses: Kir-Antipov/mc-publish@v3.3
         with:

@@ -83,12 +83,12 @@ jobs:
 
       - name: "Test with Gradle"
         id: test
-        run: ./gradlew runGameTestServer
+        run: ./gradlew runGameTestServer --no-configuration-cache
 
       - name: "Run datagen with Gradle"
         if: ${{ inputs.check-datagen }}
         id: datagen
-        run: ./gradlew runData
+        run: ./gradlew runData --no-configuration-cache
 
       - name: "Check for datagen Changes"
         if: ${{ inputs.check-datagen }}

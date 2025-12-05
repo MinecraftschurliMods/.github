@@ -33,6 +33,15 @@ on:
       datagen-folder:
         type: string
         default: ""
+      setup-gradle-task:
+        type: string
+        default: "setupGitHubActions"
+      run-gametests-task:
+        type: string
+        default: "runGameTestServer"
+      run-datagen-task:
+        type: string
+        default: "runData"
 
     secrets:
       MAVEN_PASSWORD:
@@ -57,10 +66,10 @@ jobs:
       RELEASE_TYPE: ${{ inputs.release-type }}
     steps:
       - name: "Checkout"
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: "Set up JDK ${{ inputs.java-version }}"
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           java-version: ${{ inputs.java-version }}
           distribution: ${{ inputs.java-distribution }}
@@ -69,13 +78,13 @@ jobs:
         run: chmod 777 gradlew
 
       - name: "Setup Gradle"
-        uses: gradle/actions/setup-gradle@v3
+        uses: gradle/actions/setup-gradle@v5
         with:
           cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
 
       - name: "Setup outputs from Gradle"
         id: setup
-        run: ./gradlew setupGitHubActions
+        run: ./gradlew ${{ inputs.setup-gradle-task }}
 
       - name: "Build with Gradle"
         id: build
@@ -83,12 +92,12 @@ jobs:
 
       - name: "Test with Gradle"
         id: test
-        run: ./gradlew runGameTestServer --no-configuration-cache
+        run: ./gradlew ${{ inputs.run-gametests-task }} --no-configuration-cache
 
       - name: "Run datagen with Gradle"
         if: ${{ inputs.check-datagen }}
         id: datagen
-        run: ./gradlew runData --no-configuration-cache
+        run: ./gradlew ${{ inputs.run-datagen-task }} --no-configuration-cache
 
       - name: "Check for datagen Changes"
         if: ${{ inputs.check-datagen }}
@@ -120,7 +129,7 @@ jobs:
           path: summary.txt
 
       - name: "Upload Build Artifacts"
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         if: ${{ inputs.upload-artifacts }}
         with:
           name: build-artifacts
@@ -129,7 +138,7 @@ jobs:
           retention-days: ${{ inputs.artifact-retention }}
 
       - name: "Upload Changelog"
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         if: ${{ inputs.upload-artifacts }}
         with:
           name: changelog

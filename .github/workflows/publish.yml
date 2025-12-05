@@ -57,19 +57,19 @@ jobs:
 
     steps:
       - name: "Download Build Artifacts"
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v6
         with:
           name: build-artifacts
           path: artifacts/
 
       - name: "Download Changelog"
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v6
         with:
           name: changelog
 
       - name: Publish to ${{ inputs.platform }}
         id: publish
-        uses: Kir-Antipov/mc-publish@v3.3
+        uses: Kira-NT/mc-publish@v3.3
         with:
           java: ${{ inputs.java-version }}
           changelog-file: changelog.md
